@@ -1,3 +1,7 @@
+add binaries for fabric in network folder in bin folder.
+
+run npm install in chaincode folder and CDRProcessing folder(inside application) to install node depedencies.
+
 Go to network folder, open the command terminal and run the below commands to set up the fabric network and install the chaincode:
 
 ./fabricNetwork.sh up
