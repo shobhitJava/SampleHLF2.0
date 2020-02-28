@@ -1,24 +1,35 @@
-add binaries for fabric in network folder in bin folder.
+Tele-CDR-Chain is the blockchain solution for CDR reconcilation. It reads the CDRs files recieved from the 
+operators and store them on blockchain. Then using reconcilation function, CDRs can be matched for both the operators
 
-run npm install in chaincode folder and CDRProcessing folder(inside application) to install node depedencies.
+#Prerequisites:
+1) add binaries for fabric in network folder in bin folder.
+2) run npm install in chaincode folder and CDRProcessing folder(inside application) to install node depedencies.
 
-Go to network folder, open the command terminal and run the below commands to set up the fabric network and install the chaincode:
+#Inculsion
+It includes a project for installing and instantiate chaincode on a blockchain network.
+It includes nodejs application to interact with  blockchian network, ideally we create 1 each of this nodejs application to connecte organizations to their respective blockchain network node.
+It includes the initial drafted chaincode file for reconcilation scenario. 
+
+# To start the blockchain network
+Note- Ensure to have prerequisite completed for hyperledger fabric
+Go to network folder, open the command terminal and run the below commands to set up the fabric network and
+install the chaincode:
 
 ./fabricNetwork.sh up
 ./fabricNetwork.sh install -v 1.3
 
-
-once the fabric network is up and running, go to CDRProcessing folder and run the below commmand to create wallet identity. it is one time command after network setup
+#nodeJS application
+#once the fabric network is up and running, go to CDRProcessing folder and run the below commmand to create wallet identity. it is one time command after network setup
  node 1_addToWallet.js 
 
-Now open 2 terminals to start the node for each operator and run the below commands in each terminal. 
+#Now open 2 terminals to start the node for each operator and run the below commands in each terminal. 
 node serverA.js
 node serverB.js
 
-The above terminals will keep looking for any CDR file in the folders of operators. path: CDRFile/operatorA and CDRFile/operatorB. As soon as file is placed it will be processed and data will be added to blockchain. After processing file will be moved to archive folder
+#The above terminals will keep looking for any CDR file in the folders of operators. path: CDRFile/operatorA and CDRFile/operatorB. As soon as file is placed it will be processed and data will be added to blockchain. After processing file will be moved to archive folder
 
-CDR file should be in below format consisting of calling number, called number, start date time, duration of call, call type incoming or outgoing, switch used. 
-Example file is there in archive folder for operatorB  "cdrText_3.csv"
+#CDR file should be in below format consisting of calling number, called number, start date time, duration of call, call type incoming or outgoing, switch used. 
+#Example file is there in archive folder for operatorB  "cdrText_3.csv"
 
 123456,456789,02/25/2020 22:01:02,3,IN,B
 123457,456790,02/25/2020 22:01:03,4,OUT,B
@@ -31,10 +42,10 @@ Example file is there in archive folder for operatorB  "cdrText_3.csv"
 123464,456797,02/25/2020 22:01:10,11,IN,B
 123465,456798,02/25/2020 22:01:11,12,OUT,B
 
-for reconciliation, execute the below command in terminal
+#for reconciliation, execute the below command in terminal
 node reconcileCDR.js 
 
-currently the date for which the reconcilition need to be done is hardcoded. it can be automated by using node-corn to schedule the job and reconcile CDR for previous day
+#currently the date for which the reconcilition need to be done is hardcoded. it can be automated by using node-corn to schedule the job and reconcile CDR for previous day
 output of reconciliation will be like below:
 { description: 'CDR Reconciliation summary report for 02/25/2020',
   totCountA: 68,
