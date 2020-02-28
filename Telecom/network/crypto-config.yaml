@@ -1,0 +1,20 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: telecom-network.com
+    Specs:
+      - Hostname: orderer
+PeerOrgs:
+ - Name: operatorA
+   Domain: operatorA.telecom-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1
+ - Name: operatorB
+   Domain: operatorB.telecom-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1
