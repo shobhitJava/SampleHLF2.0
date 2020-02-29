@@ -97,11 +97,12 @@ class InterconnectContract extends Contract {
       let startTimeAP = timearr[1];
       //console.log("sTime ", sTime);
       //console.log("timearr ", timearr[0], "- ", timearr[1]);
-
-      if (startTimeAP == 'PM') {
+      startTime = timearr[0];
+      if (startTimeAP == 'PM' ) {
         let timeArr = timearr[0].split(':');
         let hour = parseInt(timeArr[0], 10) + 12;
-        startTime = hour.toString().concat(':', timeArr[1], ':', timeArr[2]);
+        if (hour != 24){
+        startTime = hour.toString().concat(':', timeArr[1], ':', timeArr[2]);}
       }
 
       if (startTimeAP == 'AM') {
