@@ -1,8 +1,0 @@
-{
-    "index":{
-        "fields":["docType","cdrId"]
-    },
-    "ddoc":"cdrDoc", 
-    "name":"cdrIndex",
-    "type":"json"
-  }
