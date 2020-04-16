@@ -1,0 +1,177 @@
+Organizations:
+  - &OrdererOrg
+    Name: Orderer
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/telecom-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+    OrdererEndpoints:
+      - orderer.telecom-network.com:7050
+
+  - &operatorA
+    Name: operatorAMSP
+    ID: operatorAMSP
+    MSPDir: crypto-config/peerOrganizations/operatorA.telecom-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('operatorAMSP.admin', 'operatorAMSP.peer', 'operatorAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('operatorAMSP.admin', 'operatorAMSP.peer', 'operatorAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('operatorAMSP.admin', 'operatorAMSP.peer', 'operatorAMSP.client')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('operatorAMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.operatorA.telecom-network.com
+        Port: 7051
+
+  - &operatorB
+    Name: operatorBMSP
+    ID: operatorBMSP
+    MSPDir: crypto-config/peerOrganizations/operatorB.telecom-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('operatorBMSP.admin', 'operatorBMSP.peer', 'operatorBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('operatorBMSP.admin', 'operatorBMSP.peer', 'operatorBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('operatorBMSP.admin', 'operatorBMSP.peer', 'operatorBMSP.client')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('operatorBMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.operatorB.telecom-network.com
+        Port: 9051
+
+  
+
+#Capabilities
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+
+#Application
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies: &ApplicationDefaultPolicies
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+      
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "ANY Endorsement"
+  Capabilities: *ApplicationCapabilities
+
+#Orderer
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+
+  EtcdRaft:
+    Consenters:
+    - Host: orderer.example.com
+      Port: 7050
+      ClientTLSCert: crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer.telecom-network.com/tls/server.crt
+      ServerTLSCert: crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer.telecom-network.com/tls/server.crt
+
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+    
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    # BlockValidation specifies what signatures must be included in the block
+    # from the orderer for the peer to validate it.
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    # Who may invoke the 'Deliver' API
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    # Who may invoke the 'Broadcast' API
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    # By default, who may modify elements at this config level
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+
+#Profiles
+Profiles:
+
+  SampleMultiNodeEtcdRaft:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Consortiums:
+      TelecomConsortium:
+        Organizations:
+          - *operatorA
+          - *operatorB
+
+  TelecomChannel:
+    Consortium: TelecomConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *operatorA
+        - *operatorB
+      Capabilities:
+        <<: *ApplicationCapabilities
+  

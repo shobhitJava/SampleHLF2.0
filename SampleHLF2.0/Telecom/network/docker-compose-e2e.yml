@@ -1,0 +1,323 @@
+version: '2'
+
+volumes:
+  orderer.telecom-network.com:
+  peer0.operatorA.telecom-network.com:
+  peer1.operatorA.telecom-network.com:
+  peer0.operatorB.telecom-network.com:
+  peer1.operatorB.telecom-network.com:
+
+networks:
+  telecomNetwork:
+
+services:
+
+  ca.operatorA.telecom-network.com:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.operatorA.telecom-network.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.operatorA.telecom-network.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.operatorA.telecom-network.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/operatorA.telecom-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.operatorA.telecom-network.com
+    networks:
+      - telecomNetwork
+
+  ca.operatorB.telecom-network.com:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.operatorB.telecom-network.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.operatorB.telecom-network.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "8054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.operatorB.telecom-network.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/operatorB.telecom-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.operatorB.telecom-network.com
+    networks:
+      - telecomNetwork
+
+  orderer.telecom-network.com:
+    extends:
+      file:   docker-base/docker-compose-base.yaml
+      service: orderer.telecom-network.com
+    container_name: orderer.telecom-network.com
+    networks:
+      - telecomNetwork
+
+#  orderer2.telecom-network.com:
+#    extends:
+#      file: docker-base/docker-compose-peer.yaml
+#      service: orderer-base
+#    environment:
+#      - ORDERER_GENERAL_LISTENPORT=8050
+#    container_name: orderer2.telecom-network.com
+#    networks:
+#      - telecomNetwork
+#    volumes:
+#      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer2.telecom-network.com/msp:/var/hyperledger/orderer/msp
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer2.telecom-network.com/tls/:/var/hyperledger/orderer/tls
+#      - orderer2.telecom-network.com:/var/hyperledger/production/orderer
+#    ports:
+#      - 8050:8050
+#
+#  orderer3.telecom-network.com:
+#    extends:
+#      file: docker-base/docker-compose-peer.yaml
+#      service: orderer-base
+#    environment:
+#      - ORDERER_GENERAL_LISTENPORT=9050
+#    container_name: orderer3.telecom-network.com
+#    networks:
+#      - telecomNetwork
+#    volumes:
+#      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer3.telecom-network.com/msp:/var/hyperledger/orderer/msp
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer3.telecom-network.com/tls/:/var/hyperledger/orderer/tls
+#      - orderer3.telecom-network.com:/var/hyperledger/production/orderer
+#    ports:
+#      - 9050:9050
+#
+#  orderer4.telecom-network.com:
+#    extends:
+#      file: docker-base/docker-compose-peer.yaml
+#      service: orderer-base
+#    environment:
+#      - ORDERER_GENERAL_LISTENPORT=10050
+#    container_name: orderer4.telecom-network.com
+#    networks:
+#      - telecomNetwork
+#    volumes:
+#      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer4.telecom-network.com/msp:/var/hyperledger/orderer/msp
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer4.telecom-network.com/tls/:/var/hyperledger/orderer/tls
+#      - orderer4.telecom-network.com:/var/hyperledger/production/orderer
+#    ports:
+#      - 10050:10050
+#      
+#  orderer5.telecom-network.com:
+#    extends:
+#      file: docker-base/docker-compose-peer.yaml
+#      service: orderer-base
+#    environment:
+#      - ORDERER_GENERAL_LISTENPORT=11050
+#    container_name: orderer5.telecom-network.com
+#    networks:
+#      - telecomNetwork
+#    volumes:
+#      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer5.telecom-network.com/msp:/var/hyperledger/orderer/msp
+#      - ./crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer5.telecom-network.com/tls/:/var/hyperledger/orderer/tls
+#      - orderer5.telecom-network.com:/var/hyperledger/production/orderer
+#    ports:
+#      - 11050:11050
+#      
+#
+  couchdbA0:
+    container_name: couchdbA0
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "5984:5984"
+    networks:
+      - telecomNetwork
+
+  peer0.operatorA.telecom-network.com:
+    container_name: peer0.operatorA.telecom-network.com
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer0.operatorA.telecom-network.com
+    environment:
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdbA0:5984
+      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+      # provide the credentials for ledger to connect to CouchDB.  The username and password must
+      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=    
+    networks:
+      - telecomNetwork
+    depends_on:
+      - couchdbA0
+
+  couchdbA1:
+    container_name: couchdbA1
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "6984:5984"
+    networks:
+      - telecomNetwork
+    
+
+  peer1.operatorA.telecom-network.com:
+    container_name: peer1.operatorA.telecom-network.com
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer1.operatorA.telecom-network.com
+    environment:
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdbA1:5984
+      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+      # provide the credentials for ledger to connect to CouchDB.  The username and password must
+      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=    
+    networks:
+      - telecomNetwork
+    depends_on:
+      - couchdbA1
+
+  couchdbB0:
+    container_name: couchdbB0
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "7984:5984"
+    networks:
+      - telecomNetwork
+
+
+  peer0.operatorB.telecom-network.com:
+    container_name: peer0.operatorB.telecom-network.com
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer0.operatorB.telecom-network.com
+    environment:
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdbB0:5984
+      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+      # provide the credentials for ledger to connect to CouchDB.  The username and password must
+      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=    
+    networks:
+      - telecomNetwork
+    depends_on:
+      - couchdbB0
+
+  couchdbB1:
+    container_name: couchdbB1
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "8984:5984"
+    networks:
+      - telecomNetwork
+
+  peer1.operatorB.telecom-network.com:
+    container_name: peer1.operatorB.telecom-network.com
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer1.operatorB.telecom-network.com
+    environment:
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdbB1:5984
+      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+      # provide the credentials for ledger to connect to CouchDB.  The username and password must
+      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    networks:
+      - telecomNetwork
+    depends_on:
+      - couchdbB1
+
+
+#  cli:
+#    container_name: cli
+#    image: hyperledger/fabric-tools:latest
+#    tty: true
+#    stdin_open: true
+#    environment:
+#      - GOPATH=/opt/gopath
+#      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#      - FABRIC_LOGGING_SPEC=INFO
+#      - CORE_PEER_ID=cli
+#      - CORE_PEER_ADDRESS=peer0.operatorA.telecom-network.com:7051
+#      - CORE_PEER_LOCALMSPID=operatorAMSP
+#      - CORE_PEER_TLS_ENABLED=true
+#      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/operatorA.telecom-network.com/peers/peer0.operatorA.telecom-network.com/tls/server.crt
+#      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/operatorA.telecom-network.com/peers/peer0.operatorA.telecom-network.com/tls/server.key
+#      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/operatorA.telecom-network.com/peers/peer0.operatorA.telecom-network.com/tls/ca.crt
+#      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/operatorA.telecom-network.com/users/Admin@operatorA.telecom-network.com/msp
+#    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#    command: /bin/bash
+#    volumes:
+#      - /var/run/:/host/var/run/
+#      - ./../chaincode/:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/
+#   #   - ./../chaincode-advanced/:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode-advanced/
+#      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+#      - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+#      - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+#    depends_on:
+#      - ca.operatorA.telecom-network.com
+#      - ca.operatorB.telecom-network.com
+#      - orderer.telecom-network.com
+#      - peer0.operatorA.telecom-network.com
+#      - peer1.operatorA.telecom-network.com
+#      - peer0.operatorB.telecom-network.com
+#      - peer1.operatorB.telecom-network.com
+#    networks:
+#      - telecomNetwork
+
+  #chaincode:
+  #  container_name: chaincode
+  #  image: hyperledger/fabric-ccenv:latest
+  #  tty: true
+  #  environment:
+  #    - GOPATH=/opt/gopath
+  #    - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+  #    - FABRIC_LOGGING_SPEC=INFO
+  #    - CORE_PEER_ID=chaincode
+  #    - CORE_PEER_ADDRESS=peer0.operatorA.telecom-network.com:7051
+  #    - CORE_PEER_LOCALMSPID=operatorAMSP
+  #    - CORE_PEER_TLS_ENABLED=true
+  #    - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/crypto/peerOrganizations/operatorA.telecom-network.com/users/Admin@operatorA.telecom-network.com/msp
+  #    - CORE_TLS_CLIENT_KEY_PATH=/opt/gopath/src/crypto/peerOrganizations/operatorA.telecom-network.com/users/Admin@operatorA.telecom-network.com/tls/client.key
+  #    - CORE_TLS_CLIENT_CERT_PATH=/opt/gopath/src/crypto/peerOrganizations/operatorA.telecom-network.com/users/Admin@operatorA.telecom-network.com/tls/client.crt
+  #    - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/crypto/peerOrganizations/operatorA.telecom-network.com/users/Admin@operatorA.telecom-network.com/tls/ca.crt
+  #  working_dir: /opt/gopath/src/chaincode
+  #  command: /bin/bash -c 'sleep 6000000'
+  #  volumes:
+  #    - /var/run/:/host/var/run/
+  #    - ./../chaincode:/opt/gopath/src/chaincode
+  #   # - ./../chaincode-advanced:/opt/gopath/src/chaincode-advanced
+  #    - ./crypto-config:/opt/gopath/src/crypto
+  #  networks:
+  #    - telecomNetwork
+

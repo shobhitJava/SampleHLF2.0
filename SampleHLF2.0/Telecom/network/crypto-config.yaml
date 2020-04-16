@@ -1,0 +1,27 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: telecom-network.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer
+        SANS:
+         - localhost
+PeerOrgs:
+ - Name: operatorA
+   Domain: operatorA.telecom-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+      SANS:
+         - localhost
+   Users:
+      Count: 1
+ - Name: operatorB
+   Domain: operatorB.telecom-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+      SANS:
+         - localhost
+   Users:
+      Count: 1
