@@ -1,0 +1,8 @@
+{
+    "index":{
+        "fields":["docType","operatorId"] 
+    },
+    "ddoc":"partyDoc", 
+    "name":"partyIndex",
+    "type":"json"
+  }
