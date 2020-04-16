@@ -1,3 +1,5 @@
+This will run on HLF version 1.4
+
 Tele-CDR-Chain is the blockchain solution for CDR reconcilation. It reads the CDRs files recieved from the 
 operators and store them on blockchain. Then using reconcilation function, CDRs can be matched for both the operators
 
