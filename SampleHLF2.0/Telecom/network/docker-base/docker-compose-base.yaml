@@ -1,0 +1,110 @@
+version: '2'
+
+services:
+
+  orderer.telecom-network.com:
+    container_name: orderer.telecom-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: orderer-base
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer.telecom-network.com/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/telecom-network.com/orderers/orderer.telecom-network.com/tls/:/var/hyperledger/orderer/tls
+        - orderer.telecom-network.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+
+  peer0.operatorA.telecom-network.com:
+    container_name: peer0.operatorA.telecom-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.operatorA.telecom-network.com
+      - CORE_PEER_ADDRESS=peer0.operatorA.telecom-network.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.operatorA.telecom-network.com:7053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7053
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.operatorA.telecom-network.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.operatorA.telecom-network.com:7051
+      - CORE_PEER_LOCALMSPID=operatorAMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/operatorA.telecom-network.com/peers/peer0.operatorA.telecom-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/operatorA.telecom-network.com/peers/peer0.operatorA.telecom-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.operatorA.telecom-network.com:/var/hyperledger/production
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer1.operatorA.telecom-network.com:
+    container_name: peer1.operatorA.telecom-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.operatorA.telecom-network.com
+      - CORE_PEER_ADDRESS=peer1.operatorA.telecom-network.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.operatorA.telecom-network.com:8053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.operatorA.telecom-network.com:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.operatorA.telecom-network.com:7051
+      - CORE_PEER_LOCALMSPID=operatorAMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/operatorA.telecom-network.com/peers/peer1.operatorA.telecom-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/operatorA.telecom-network.com/peers/peer1.operatorA.telecom-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.operatorA.telecom-network.com:/var/hyperledger/production
+
+    ports:
+      - 8051:8051
+      - 8053:8053
+
+  peer0.operatorB.telecom-network.com:
+    container_name: peer0.operatorB.telecom-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.operatorB.telecom-network.com
+      - CORE_PEER_ADDRESS=peer0.operatorB.telecom-network.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.operatorB.telecom-network.com:9053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.operatorB.telecom-network.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.operatorB.telecom-network.com:10051
+      - CORE_PEER_LOCALMSPID=operatorBMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/operatorB.telecom-network.com/peers/peer0.operatorB.telecom-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/operatorB.telecom-network.com/peers/peer0.operatorB.telecom-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.operatorB.telecom-network.com:/var/hyperledger/production
+    ports:
+      - 9051:9051
+      - 9053:9053
+
+  peer1.operatorB.telecom-network.com:
+    container_name: peer1.operatorB.telecom-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.operatorB.telecom-network.com
+      - CORE_PEER_ADDRESS=peer1.operatorB.telecom-network.com:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.operatorB.telecom-network.com:10053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.operatorB.telecom-network.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.operatorB.telecom-network.com:9051
+      - CORE_PEER_LOCALMSPID=operatorBMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/operatorB.telecom-network.com/peers/peer1.operatorB.telecom-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/operatorB.telecom-network.com/peers/peer1.operatorB.telecom-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.operatorB.telecom-network.com:/var/hyperledger/production
+    ports:
+      - 10051:10051
+      - 10053:10053
+
