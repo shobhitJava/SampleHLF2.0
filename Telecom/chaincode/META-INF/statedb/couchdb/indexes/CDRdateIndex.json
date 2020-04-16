@@ -1,9 +1,0 @@
-{
-    "index":{
-        "fields":["docType", "operatorId","startDate"] 
-    },
-    "ddoc":"dateDoc", 
-    "name":"dateIndex",
-    "type":"json"
-  }
-
