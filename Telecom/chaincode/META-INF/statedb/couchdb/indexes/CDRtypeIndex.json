@@ -1,8 +1,0 @@
-  {
-    "index":{
-        "fields":["docType","operatorId", "callType","startDate"] 
-    },
-    "ddoc":"typeDoc", 
-    "name":"typeIndex",
-    "type":"json"
-  }
